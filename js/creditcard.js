@@ -13,11 +13,21 @@
       discover: /^(?:6011|644[0-9]|65[0-9]{2})[0-9]{12}$/
     };
 
-    CreditCard.type = function(number) {
-      var regex, type, _ref;
-      _ref = this.types;
-      for (type in _ref) {
-        regex = _ref[type];
+    CreditCard.prefixes = {
+      visa: /^4[0-9]/,
+      mastercard: /^5[1-5]/,
+      amex: /^3[4|7]/,
+      discover: /^(6011|644|65)/
+    };
+
+    CreditCard.type = function(number, strict) {
+      var regex, regexes, type;
+      if (strict == null) {
+        strict = false;
+      }
+      regexes = strict ? this.types : this.prefixes;
+      for (type in regexes) {
+        regex = regexes[type];
         if (regex.test(number)) {
           return type;
         }
@@ -45,7 +55,7 @@
     };
 
     CreditCard.valid = function(number) {
-      return this.type(number) !== false && this.luhn(number);
+      return this.type(number, true) !== false && this.luhn(number);
     };
 
     return CreditCard;
